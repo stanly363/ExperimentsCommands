@@ -45,8 +45,7 @@ sudo tshark -i eth0 -f "tcp port 80" -w user_login.pcap
 # After generating traffic, press Ctrl+C in this terminal to stop the capture.
 
 # Analyse the capture file to find credentials from POST requests
-tshark -r user_login.pcap -Y "http.request.method == POST" -T fields \\
--e urlencoded-form.value
+tshark -r user_login.pcap -Y "http.request.method == POST" -T fields -e urlencoded-form.value
 ```
 
 ---
