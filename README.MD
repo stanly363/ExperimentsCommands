@@ -103,7 +103,7 @@ sudo apt-get install -y dirb
 
 # Run a directory scan against the web server using a common wordlist
 # Note: The path to wordlists might vary.
-dirb [http://192.168.10.12](http://192.168.10.12) /usr/share/dirb/wordlists/common.txt
+dirb http://192.168.10.12 /usr/share/dirb/wordlists/common.txt
 ```
 
 ---
