@@ -288,21 +288,21 @@ sudo snap install john
 # Create a custom username list
 nano usernames.txt
 # Add the following lines to the file, then save and exit:
-# root
-# admin
-# user
-# testuser
-# dev_user
-# test_user_02
+root
+admin
+user
+testuser
+dev_user
+test_user_02
 
 # Create a custom password list
 nano passwords.txt
 # Add the following lines to the file, then save and exit:
-# 123456
-# password
-# qwerty
-# sunshine
-# welcome
+123456
+password
+qwerty
+sunshine
+welcome
 
 # Download the rockyou.txt wordlist for the offline attack
 wget https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt
