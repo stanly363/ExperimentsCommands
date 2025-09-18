@@ -358,9 +358,9 @@ sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 # Edit the local configuration
 sudo nano /etc/fail2ban/jail.local
 # Find the [sshd] section and ensure it contains:
-# enabled = true
-# maxretry = 3
-# bantime = 10m
+enabled = true
+maxretry = 3
+bantime = 10m
 
 # Restart Fail2ban to apply the new jail
 sudo systemctl restart fail2ban
@@ -680,11 +680,11 @@ sudo apt-get install -y postfix mutt
 # Edit the main Postfix configuration file
 sudo nano /etc/postfix/main.cf
 # --- In the editor, ensure the following values are set correctly ---
-# myhostname = server.internal-workspace.co.uk
-# mydomain = internal-workspace.co.uk
-# myorigin = $mydomain
-# mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
-# home_mailbox = Maildir/
+myhostname = server.internal-workspace.co.uk
+mydomain = internal-workspace.co.uk
+myorigin = $mydomain
+mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
+home_mailbox = Maildir/
 # --- Save and exit the editor ---
 
 # Add the lab's local network to the list of trusted networks
@@ -816,8 +816,8 @@ mutt
 sudo apt-get autoremove --purge <package_name>
 
 # To harden the kernel, add the following lines to /etc/sysctl.conf
-# net.ipv4.ip_forward = 0
-# net.ipv4.tcp_syncookies = 1
+net.ipv4.ip_forward = 0
+net.ipv4.tcp_syncookies = 1
 
 # Apply the new kernel parameters without rebooting
 sudo sysctl -p
@@ -887,7 +887,6 @@ sudo python IDS.py --i eth0 --use-pretrained
 # 3. (Alternatively) Run the IDS using your self-trained model
 # Replace 'eth0' with your actual interface name
 sudo python IDS.py --i eth0
-
 
 # --- On Windows ---
 
@@ -963,12 +962,12 @@ sudo apt-get install -y php-fpm
 sudo nano /etc/nginx/sites-available/default
 # Inside the editor, find and uncomment the 'location ~ \.php$' block.
 # It should look similar to this:
-#
-# location ~ \.php$ {
-#   include snippets/fastcgi-php.conf;
-#   fastcgi_pass unix:/var/run/php/php7.2-fpm.sock; # Path may vary
-# }
-#
+
+location ~ \.php$ {
+  include snippets/fastcgi-php.conf;
+  fastcgi_pass unix:/var/run/php/php7.2-fpm.sock; # Path may vary
+}
+
 # Save and exit the editor.
 
 # Create the vulnerable PHP login page
